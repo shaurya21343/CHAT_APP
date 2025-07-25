@@ -9,7 +9,7 @@ type ChatMessage = {
   message: string
 }
 
-export default function page() {
+export default function Page() {
   const [user, setUser] = useState('')
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -33,16 +33,23 @@ export default function page() {
     if (!user) return
     const presence = pusherClient.subscribe('presence-chat') 
 
-    presence.bind('pusher:subscription_succeeded', (members :any) => {
-      const users = Object.values(members.members).map((m: any) => m.name)
+    type PresenceMembers = {
+      members: { [id: string]: { name: string } }
+    }
+    type PresenceMember = {
+      info: { name: string }
+    }
+
+    presence.bind('pusher:subscription_succeeded', (members: PresenceMembers) => {
+      const users = Object.values(members.members).map((m) => m.name)
       setOnlineUsers(users)
     })
 
-    presence.bind('pusher:member_added', (member: any) => {
+    presence.bind('pusher:member_added', (member: PresenceMember) => {
       setOnlineUsers(prev => [...prev, member.info.name])
     })
 
-    presence.bind('pusher:member_removed', (member: any) => {
+    presence.bind('pusher:member_removed', (member: PresenceMember) => {
       setOnlineUsers(prev => prev.filter(name => name !== member.info.name))
     })
 
