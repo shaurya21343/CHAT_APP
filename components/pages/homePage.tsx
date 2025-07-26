@@ -19,6 +19,23 @@ export default function Page() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
+  useEffect(() => {
+    const fetchMessages = async () => {
+      const res = await fetch('/api/GetAllMessage')
+      const data = await res.json()
+
+      if (Array.isArray(data) && data.length > 0) {
+        setMessages(data)
+        // Scroll to the bottom when messages are loaded
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+        console.log('Fetched messages:', data)
+      }
+      console.log('Fetched messages:', data)
+    }
+
+    fetchMessages()
+  }, [])
+
   // Autofill name when signed in
   useEffect(() => {
     if (clerkUser) {
